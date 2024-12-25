@@ -2,6 +2,7 @@ const express = require("express");
 const { PORT } = require("./config");
 const bodyParser = require("body-parser");
 const cluster = require("cluster");
+const cors = require("cors");
 const os = require("os");
 const { routeTracing } = require("./src/middlewares/feature-middlewares");
 
@@ -33,6 +34,7 @@ if (cluster.isMaster) {
   const app = express();
 
   // Middleware
+  app.use(cors("*"));
   app.use(bodyParser.json());
   app.use(routeTracing);
   app.use("/api/v1/quick", routes);
