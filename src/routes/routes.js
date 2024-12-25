@@ -7,6 +7,7 @@ const ZeptoApis = require("../zepto/zeptoApiServices");
 const BlinkItApis = require("../blinkit/blinkitApiServices");
 const SwiggyApis = require("../swiggy/swiggyApiServices");
 const { start } = require("repl");
+const { mergeProductData } = require("../constants");
 
 const filePath = path.join(__dirname, "../../data.json");
 
@@ -44,6 +45,7 @@ router.post("/products-list", async (req, res) => {
     query,
     start = 2,
     size = 20,
+    page,
   } = req.body || {};
   const productsData = await Promise.all([
     new ZeptoApis().getSearchedProductList(
@@ -62,7 +64,21 @@ router.post("/products-list", async (req, res) => {
     ),
     new SwiggyApis().getSearchedProductList(latitude, longitude, query),
   ]);
-  return res.status(200).json(productsData);
+  const updatedData = mergeProductData(productsData);
+  const filteredProducts = updatedData.filter(
+    (item) => Object.keys(item).length >= 4
+  );
+  const unfiltered = updatedData.filter(
+    (item) => Object.keys(item).length >= 1
+  );
+  const finalProducts = [...filteredProducts, ...unfiltered];
+  const response = {
+    totalItems: finalProducts.length,
+    page,
+    data: finalProducts,
+  };
+
+  return res.status(200).json(finalProducts);
 });
 
 module.exports = router;
