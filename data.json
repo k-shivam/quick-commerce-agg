@@ -1,0 +1,23 @@
+[
+  {
+    "eta": "6 Mins",
+    "image": "https://qcsearch.s3.ap-south-1.amazonaws.com/swiggy.png",
+    "url": "https://swiggy.com",
+    "platform": "Swiggy",
+    "open": true
+  },
+  {
+    "eta": "8 Mins",
+    "image": "https://qcsearch.s3.ap-south-1.amazonaws.com/blinkit.png",
+    "url": "https://blinkit.com",
+    "platform": "BlinkIt",
+    "open": true
+  },
+  {
+    "eta": "9 Mins",
+    "image": "https://qcsearch.s3.ap-south-1.amazonaws.com/zepto.png",
+    "platform": "Zepto",
+    "open": true,
+    "url": "https://zeptonow.com"
+  }
+]
