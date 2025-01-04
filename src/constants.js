@@ -5,6 +5,12 @@ const quantityMapping = {
   MILLILITRE: "ml",
 };
 
+const colorMapping = {
+  BlinkIt: "yellow",
+  Zepto: "purple",
+  Swiggy: "orange",
+};
+
 const mergeProductData = (data) => {
   const productMap = {};
   data.forEach((platformData) => {
@@ -19,25 +25,17 @@ const mergeProductData = (data) => {
         platform,
       } = product;
       const productKey = `${name}-${brand}`;
-      if (productMap[productKey]) {
-        productMap[productKey][platform] = {
+      productMap[productKey] = {
+        name,
+        brand,
+        [platform]: {
           price,
           discountedPrice,
           quantity,
           etaInfo,
-        };
-      } else {
-        productMap[productKey] = {
-          name,
-          brand,
-          [platform]: {
-            price,
-            discountedPrice,
-            quantity,
-            etaInfo,
-          },
-        };
-      }
+          color: colorMapping[platform],
+        },
+      };
     });
   });
 
