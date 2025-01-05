@@ -65,13 +65,10 @@ router.post("/products-list", async (req, res) => {
     new SwiggyApis().getSearchedProductList(latitude, longitude, query),
   ]);
   const updatedData = mergeProductData(productsData);
-  const filteredProducts = updatedData.filter(
-    (item) => Object.keys(item).length >= 4
-  );
   const unfiltered = updatedData.filter(
     (item) => Object.keys(item).length >= 1
   );
-  const finalProducts = [...filteredProducts, ...unfiltered];
+  const finalProducts = [...unfiltered];
   const response = {
     totalItems: finalProducts.length,
     page,
