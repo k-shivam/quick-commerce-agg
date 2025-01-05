@@ -82,23 +82,24 @@ class ZeptoApis {
             Array.isArray(layoutItem.data.resolver.data.items)
           ) {
             layoutItem.data.resolver.data.items.forEach((item) => {
-              if (count < 6) {
-                // Check if the finalData array has less than 6 items
-                const finalProduct = {
-                  brand: item.productResponse.product.brand,
-                  name: item.productResponse.product.name,
-                  price: item.productResponse.mrp / 100,
-                  discountedPrice: item.productResponse.sellingPrice / 100,
-                  quantity: `${item.productResponse.productVariant.packsize} ${
-                    quantityMapping[
-                      item.productResponse.productVariant.unitOfMeasure
-                    ]
-                  }`,
-                  ...eta,
-                };
-                finalData.push(finalProduct);
-                count++; // Increment the counter
-              }
+              // if (count < 6) {
+              // Check if the finalData array has less than 6 items
+              const finalProduct = {
+                brand: item.productResponse.product.brand,
+                name: item.productResponse.product.name,
+                price: item.productResponse.mrp / 100,
+                discountedPrice: item.productResponse.sellingPrice / 100,
+                product_id: item.productResponse.productVariant.id,
+                quantity: `${item.productResponse.productVariant.packsize} ${
+                  quantityMapping[
+                    item.productResponse.productVariant.unitOfMeasure
+                  ]
+                }`,
+                ...eta,
+              };
+              finalData.push(finalProduct);
+              count++; // Increment the counter
+              // }
             });
           }
         });
