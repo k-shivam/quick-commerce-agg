@@ -91,18 +91,19 @@ class BlinkItApis {
       const result = await response.text();
       const resp = JSON.parse(result);
       resp.products.forEach((item) => {
-        if (count < 6) {
-          const finalProduct = {
-            brand: item.brand,
-            name: item.name,
-            price: item.mrp,
-            discountedPrice: item.price,
-            quantity: item.unit,
-            ...eta,
-          };
-          finalData.push(finalProduct);
-          count++;
-        }
+        // if (count < 6) {
+        const finalProduct = {
+          brand: item.brand,
+          name: item.name,
+          price: item.mrp,
+          discountedPrice: item.price,
+          quantity: item.unit,
+          product_id: item.product_id,
+          ...eta,
+        };
+        finalData.push(finalProduct);
+        count++;
+        // }
       });
       return finalData;
     } catch (err) {
