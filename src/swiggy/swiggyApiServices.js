@@ -85,12 +85,12 @@ class SwiggyApis {
               discountedPrice: variation.price.offer_price,
               price: variation.price.mrp,
               quantity: variation.quantity,
+              product_id: item.product_id,
               ...eta,
             };
           })
           ?.filter(Boolean) || []; // Remove null entries
-
-      return products.slice(0, 6); // Return only the first 6 products
+      return products; // Return only the first 6 products
     } catch (error) {
       console.error("Error fetching searched product list:", error.message);
       return []; // Return an empty array in case of an error
