@@ -30,6 +30,7 @@ const mergeProductData = (data) => {
         name,
         brand,
         product_id,
+        platform,
         [platform]: {
           price,
           discountedPrice,
