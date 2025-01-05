@@ -31,13 +31,11 @@ const mergeProductData = (data) => {
         brand,
         product_id,
         platform_name: platform,
-        [platform]: {
-          price,
-          discountedPrice,
-          quantity,
-          etaInfo,
-          color: colorMapping[platform],
-        },
+        price,
+        discountedPrice,
+        quantity,
+        etaInfo,
+        color: colorMapping[platform],
       };
     });
   });
