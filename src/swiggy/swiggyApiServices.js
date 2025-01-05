@@ -86,7 +86,9 @@ class SwiggyApis {
               price: variation.price.mrp,
               quantity: variation.quantity,
               product_id: item.product_id,
-              ...eta,
+              etaInfo: eta.etaInfo,
+              store_id: eta.storeid,
+              platform: eta.platform,
             };
           })
           ?.filter(Boolean) || []; // Remove null entries
