@@ -95,7 +95,9 @@ class ZeptoApis {
                     item.productResponse.productVariant.unitOfMeasure
                   ]
                 }`,
-                ...eta,
+                etaInfo: eta.etaInfo,
+                store_id: "",
+                platform: eta.platform,
               };
               finalData.push(finalProduct);
               count++; // Increment the counter
