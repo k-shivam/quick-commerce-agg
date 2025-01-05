@@ -23,11 +23,13 @@ const mergeProductData = (data) => {
         quantity,
         etaInfo,
         platform,
+        product_id,
       } = product;
       const productKey = `${name}-${brand}`;
       productMap[productKey] = {
         name,
         brand,
+        product_id,
         [platform]: {
           price,
           discountedPrice,
