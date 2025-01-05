@@ -24,6 +24,7 @@ const mergeProductData = (data) => {
         etaInfo,
         platform,
         product_id,
+        store_id,
       } = product;
       const productKey = `${name}-${brand}`;
       productMap[productKey] = {
@@ -36,6 +37,7 @@ const mergeProductData = (data) => {
         quantity,
         etaInfo,
         color: colorMapping[platform],
+        store_id,
       };
     });
   });
