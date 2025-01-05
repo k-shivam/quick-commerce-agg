@@ -99,7 +99,9 @@ class BlinkItApis {
           discountedPrice: item.price,
           quantity: item.unit,
           product_id: item.product_id,
-          ...eta,
+          etaInfo: eta.etaInfo,
+          store_id: "",
+          platform: eta.platform,
         };
         finalData.push(finalProduct);
         count++;
