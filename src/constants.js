@@ -49,7 +49,15 @@ const mergeProductData = (data) => {
   return result;
 };
 
+const normalizeName = (name) => {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s]/gi, "");
+};
+
 module.exports = {
   quantityMapping,
   mergeProductData,
+  normalizeName,
 };
