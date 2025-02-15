@@ -55,7 +55,9 @@ class ZeptoApis {
     longitude,
     query,
     pageNumber,
-    mode
+    mode,
+    page,
+    limit
   ) => {
     try {
       let finalData = [];
@@ -95,6 +97,7 @@ class ZeptoApis {
                     item.productResponse.productVariant.unitOfMeasure
                   ]
                 }`,
+                images: item.productResponse.productVariant.images,
                 etaInfo: eta.etaInfo,
                 store_id: "",
                 platform: eta.platform,
@@ -105,7 +108,10 @@ class ZeptoApis {
             });
           }
         });
-        return finalData;
+        const startIndex = (page -1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedData = finalData.slice(startIndex, endIndex)
+        return paginatedData;
       }
     } catch (err) {
       console.log(err);
