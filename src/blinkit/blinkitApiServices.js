@@ -47,7 +47,9 @@ class BlinkItApis {
     longitude,
     q,
     start = 2,
-    size = 20
+    size = 20,
+    page,
+    limit
   ) => {
     const myHeaders = new Headers();
     myHeaders.append("accept", "*/*");
@@ -102,12 +104,16 @@ class BlinkItApis {
           etaInfo: eta.etaInfo,
           store_id: "",
           platform: eta.platform,
+          images: item.images
         };
         finalData.push(finalProduct);
         count++;
         // }
       });
-      return finalData;
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedData = finalData.slice(startIndex, endIndex);
+      return paginatedData;
     } catch (err) {
       console.log(err.message);
     }
