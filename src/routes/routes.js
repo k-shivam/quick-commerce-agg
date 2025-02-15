@@ -37,89 +37,75 @@ router.post("/delivery-est", async (req, res) => {
 });
 
 router.post("/products-list", async (req, res) => {
-  const {
-    latitude,
-    longitude,
-    pageNumber,
-    mode,
-    query,
-    start = 2,
-    size = 20,
-    page,
-  } = req.body || {};
-  const productsData = await Promise.all([
-    new ZeptoApis().getSearchedProductList(
+  try {
+    const {
       latitude,
       longitude,
-      query,
       pageNumber,
-      mode
-    ),
-    new BlinkItApis().getSearchedProductList(
-      latitude,
-      longitude,
+      mode,
       query,
-      start,
-      size
-    ),
-    new SwiggyApis().getSearchedProductList(latitude, longitude, query),
-  ]);
+      start = 2,
+      size = 20,
+      page = 1,
+      limit = 20
+    } = req.body || {};
 
-  const allProducts = [
-    ...productsData[0].map((p) => ({ ...p, source: "Zepto" })),
-    ...productsData[1].map((p) => ({ ...p, source: "BlinkIt" })),
-    ...productsData[2].map((p) => ({ ...p, source: "Swiggy" })),
-  ];
+    const productsData = await Promise.all([
+      new ZeptoApis().getSearchedProductList(
+        latitude, longitude, query, pageNumber, mode, page, limit
+      ),
+      new BlinkItApis().getSearchedProductList(
+        latitude, longitude, query, start, size, page, limit
+      ),
+      new SwiggyApis().getSearchedProductList(latitude, longitude, query, page, limit),
+    ]);
 
-  const groupedProducts = {};
-  for (const product of allProducts) {
-    const normalized = normalizeName(product.name);
+    // Combine all products with source labels
+    const allProducts = [
+      ...productsData[0].map((p) => ({ ...p, source: "Zepto" })),
+      ...productsData[1].map((p) => ({ ...p, source: "BlinkIt" })),
+      ...productsData[2].map((p) => ({ ...p, source: "Swiggy" })),
+    ];
 
-    if (!groupedProducts[normalized]) {
-      groupedProducts[normalized] = [];
-    }
+    // Group products by name
+    let groupedProducts = {};
+    allProducts.forEach(product => {
+      const productName = product.name;
 
-    groupedProducts[normalized].push(product);
+      if (!groupedProducts[productName]) {
+        groupedProducts[productName] = [];
+      }
+
+      groupedProducts[productName].push({
+        platform: product.platform,
+        source: product.source,
+        brand: product.brand,
+        price: product.price,
+        discountedPrice: product.discountedPrice,
+        product_id: product.product_id,
+        quantity: product.quantity,
+        images: product.images?.map(img => img.path) || [],
+        etaInfo: product.etaInfo,
+        store_id: product.store_id
+      });
+    });
+
+    // Calculate pagination metadata
+    const totalItems = allProducts.length;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return res.status(200).json({
+      page,
+      limit,
+      totalItems,
+      totalPages,
+      data: groupedProducts
+    });
+
+  } catch (error) {
+    console.error("Error fetching product list:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-  return res.status(200).json(groupedProducts);
 });
-
-//   const finalProducts = [...filteredProducts];
-
-//   // const unfiltered = updatedData.filter(
-//   //   (item) => Object.keys(item).length >= 1
-//   // );
-//   // const finalProducts = [...unfiltered];
-//   const response = {
-//     totalItems: finalProducts.length,
-//     page,
-//     data: finalProducts,
-//   };
-
-//   return res.status(200).json(response);
-// });
-
-// function groupAndMergeProducts(products) {
-//   const productMap = new Map();
-
-//   products.forEach((product) => {
-//     const { brand, productName, quantity } = product;
-
-//     // Create a unique key for grouping based on brand, productName, and quantity
-//     const key = `${brand}_${productName}_${quantity}`;
-
-//     if (productMap.has(key)) {
-//       // If the product already exists, update the quantity
-//       const existingProduct = productMap.get(key);
-//       existingProduct.quantity += quantity;
-//     } else {
-//       // If the product doesn't exist, add it to the map
-//       productMap.set(key, { ...product });
-//     }
-//   });
-
-//   // Convert the map to an array of merged products
-//   return Array.from(productMap.values());
-// }
 
 module.exports = router;
