@@ -33,7 +33,7 @@ class SwiggyApis {
     }
   };
 
-  getSearchedProductList = async (latitude, longitude, query) => {
+  getSearchedProductList = async (latitude, longitude, query, page, limit) => {
     try {
       const headers = {
         "User-Agent":
@@ -89,10 +89,14 @@ class SwiggyApis {
               etaInfo: eta.etaInfo,
               store_id: eta.storeid,
               platform: eta.platform,
+              images: variation.images
             };
           })
           ?.filter(Boolean) || []; // Remove null entries
-      return products; // Return only the first 6 products
+          const startIndex = (page -1) * limit;
+          const endIndex = startIndex + limit;
+          const paginatedData = products.slice(startIndex, endIndex);
+          return paginatedData; // Return only the first 6 products
     } catch (error) {
       console.error("Error fetching searched product list:", error.message);
       return []; // Return an empty array in case of an error
