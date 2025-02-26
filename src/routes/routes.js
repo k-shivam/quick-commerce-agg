@@ -50,7 +50,7 @@ router.post("/products-list", async (req, res) => {
       limit = 20
     } = req.body || {};
 
-    const productsData = await Promise.all([
+    const [zeptoData, blinkItData, swiggyData] = await Promise.all([
       new ZeptoApis().getSearchedProductList(
         latitude, longitude, query, pageNumber, mode, page, limit
       ),
@@ -60,48 +60,61 @@ router.post("/products-list", async (req, res) => {
       new SwiggyApis().getSearchedProductList(latitude, longitude, query, page, limit),
     ]);
 
-    // Combine all products with source labels
-    const allProducts = [
-      ...productsData[0].map((p) => ({ ...p, source: "Zepto" })),
-      ...productsData[1].map((p) => ({ ...p, source: "BlinkIt" })),
-      ...productsData[2].map((p) => ({ ...p, source: "Swiggy" })),
-    ];
+    // Initialize structured response
+    let structuredResponse = {
+      Zepto: {},
+      Swiggy: {},
+      Blinkit: {},
+      Kakeibo: {}
+    };
 
-    // Group products by name
-    let groupedProducts = {};
-    allProducts.forEach(product => {
-      const productName = product.name;
+    const platforms = {
+      Zepto: zeptoData,
+      Blinkit: blinkItData,
+      Swiggy: swiggyData
+    };
 
-      if (!groupedProducts[productName]) {
-        groupedProducts[productName] = [];
-      }
+    Object.entries(platforms).forEach(([platform, products]) => {
+      products.forEach(product => {
+        const productName = product.name;
+        
+        // Organize under main platform
+        if (!structuredResponse[platform][productName]) {
+          structuredResponse[platform][productName] = [];
+        }
+        structuredResponse[platform][productName].push({
+          platform: product.platform,
+          source: platform,
+          brand: product.brand,
+          price: product.price,
+          discountedPrice: product.discountedPrice,
+          product_id: product.product_id,
+          quantity: product.quantity,
+          images: product.images?.map(img => img.path) || [],
+          etaInfo: product.etaInfo,
+          store_id: product.store_id
+        });
 
-      groupedProducts[productName].push({
-        platform: product.platform,
-        source: product.source,
-        brand: product.brand,
-        price: product.price,
-        discountedPrice: product.discountedPrice,
-        product_id: product.product_id,
-        quantity: product.quantity,
-        images: product.images?.map(img => img.path) || [],
-        etaInfo: product.etaInfo,
-        store_id: product.store_id
+        // Organize under Kakeibo
+        if (!structuredResponse.Kakeibo[productName]) {
+          structuredResponse.Kakeibo[productName] = {};
+        }
+        structuredResponse.Kakeibo[productName][platform] = {
+          platform: product.platform,
+          source: platform,
+          brand: product.brand,
+          price: product.price,
+          discountedPrice: product.discountedPrice,
+          product_id: product.product_id,
+          quantity: product.quantity,
+          images: product.images?.map(img => img.path) || [],
+          etaInfo: product.etaInfo,
+          store_id: product.store_id
+        };
       });
     });
 
-    // Calculate pagination metadata
-    const totalItems = allProducts.length;
-    const totalPages = Math.ceil(totalItems / limit);
-
-    return res.status(200).json({
-      page,
-      limit,
-      totalItems,
-      totalPages,
-      data: groupedProducts
-    });
-
+    return res.status(200).json(structuredResponse);
   } catch (error) {
     console.error("Error fetching product list:", error);
     return res.status(500).json({ message: "Internal Server Error" });
