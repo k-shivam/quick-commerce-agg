@@ -50,13 +50,10 @@ router.post("/products-list", async (req, res) => {
       limit = 20
     } = req.body || {};
 
+    // Fetch data from different platforms
     const [zeptoData, blinkItData, swiggyData] = await Promise.all([
-      new ZeptoApis().getSearchedProductList(
-        latitude, longitude, query, pageNumber, mode, page, limit
-      ),
-      new BlinkItApis().getSearchedProductList(
-        latitude, longitude, query, start, size, page, limit
-      ),
+      new ZeptoApis().getSearchedProductList(latitude, longitude, query, pageNumber, mode, page, limit),
+      new BlinkItApis().getSearchedProductList(latitude, longitude, query, start, size, page, limit),
       new SwiggyApis().getSearchedProductList(latitude, longitude, query, page, limit),
     ]);
 
@@ -77,29 +74,9 @@ router.post("/products-list", async (req, res) => {
     Object.entries(platforms).forEach(([platform, products]) => {
       products.forEach(product => {
         const productName = product.name;
-        
-        // Organize under main platform
-        if (!structuredResponse[platform][productName]) {
-          structuredResponse[platform][productName] = [];
-        }
-        structuredResponse[platform][productName].push({
-          platform: product.platform,
-          source: platform,
-          brand: product.brand,
-          price: product.price,
-          discountedPrice: product.discountedPrice,
-          product_id: product.product_id,
-          quantity: product.quantity,
-          images: product.images?.map(img => img.path) || [],
-          etaInfo: product.etaInfo,
-          store_id: product.store_id
-        });
 
-        // Organize under Kakeibo
-        if (!structuredResponse.Kakeibo[productName]) {
-          structuredResponse.Kakeibo[productName] = {};
-        }
-        structuredResponse.Kakeibo[productName][platform] = {
+        // Standardized product structure
+        const productData = {
           platform: product.platform,
           source: platform,
           brand: product.brand,
@@ -111,6 +88,18 @@ router.post("/products-list", async (req, res) => {
           etaInfo: product.etaInfo,
           store_id: product.store_id
         };
+
+        // Organize under main platform
+        if (!structuredResponse[platform][productName]) {
+          structuredResponse[platform][productName] = [];
+        }
+        structuredResponse[platform][productName].push(productData);
+
+        // Organize under Kakeibo
+        if (!structuredResponse.Kakeibo[productName]) {
+          structuredResponse.Kakeibo[productName] = {};
+        }
+        structuredResponse.Kakeibo[productName][platform] = productData;
       });
     });
 
@@ -120,5 +109,6 @@ router.post("/products-list", async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 
 module.exports = router;
