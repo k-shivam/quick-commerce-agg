@@ -71,6 +71,7 @@ class SwiggyApis {
       }
 
       const result = await response.json();
+      console.log(result)
 
       // Process and return the products
       const products =
