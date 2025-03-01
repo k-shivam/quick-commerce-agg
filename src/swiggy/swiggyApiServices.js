@@ -64,6 +64,8 @@ class SwiggyApis {
         body,
       };
 
+      console.log(url, requestOptions)
+
       const response = await fetch(url, requestOptions);
 
       if (!response.ok) {
